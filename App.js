@@ -1,28 +1,37 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, Button, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, ScrollView, FlatList, Modal } from 'react-native';
+import uuid from 'react-native-uuid' //Generador de ids 
 
 export default function App() {
   const [newTask, setNewTask] = useState({
+    id: "",
     title: "",
     description: ""
   })
   const [tasks, setTasks] = useState([])
-
+  const [modalVisible, setModalVisible] = useState(false)
+ 
   const addTask = () => {
     setTasks([...tasks, newTask])
-    console.log(tasks)
     setNewTask({
+      id: "",
       title: "",
       description: ""
     })
   }
 
   const onHandlerTitle = (t) => {
-    setNewTask({ ...newTask, title: t })
+    const id = uuid.v4()
+    setNewTask({ ...newTask, title: t, id })
   }
 
   const onHandlerDescription = (t) => {
     setNewTask({ ...newTask, description: t })
+  }
+
+  const deleteTask = (id) => {
+    // setTasks(tasks.filter(task => task != id))
+    setModalVisible(true)
   }
 
   return (
@@ -34,7 +43,7 @@ export default function App() {
         <Button color="#3921F5" title='Agregar tarea' onPress={addTask} />
       </View>
 
-      <ScrollView style={styles.tasksContainer}>
+      {/* <ScrollView style={styles.tasksContainer}>
         {tasks.map((item, id) => (
           <View style={styles.taskCard} key={id}>
             <Text style={styles.text}>
@@ -43,7 +52,29 @@ export default function App() {
             <Button title='DEL' />
           </View>
         ))}
-      </ScrollView>
+      </ScrollView> */}
+
+      <View style={styles.tasksContainer}>
+        <FlatList
+          data={tasks}
+          keyExtractor={tasks => tasks.id}
+          renderItem={({ item }) => (
+            <View style={styles.taskCard} key={item.id}>
+              <Text style={styles.text}>
+                {item.title}
+              </Text>
+              <Button title='DEL' onPress={() => deleteTask(item.id)} />
+            </View>
+          )}
+        />
+        <Modal visible={modalVisible} >
+          <View>
+            <Text>Estas seguro que quieres borrar?</Text>
+            <Button title='si' onPress={() => console.log("Eliminar")}/>
+            <Button title='no' onPress={() => setModalVisible(false)} />
+          </View>
+        </Modal>
+      </View>
 
     </View>
   );
@@ -84,7 +115,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#872FF5",
     padding: 20,
     alignItems: "center",
-    borderRadius: 5, 
+    borderRadius: 5,
     marginVertical: 10
   },
 
