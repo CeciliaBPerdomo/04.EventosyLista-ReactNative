@@ -10,6 +10,7 @@ export default function App() {
   })
   const [tasks, setTasks] = useState([])
   const [modalVisible, setModalVisible] = useState(false)
+  const [idSelected, setIdSelected] = useState(0)
  
   const addTask = () => {
     setTasks([...tasks, newTask])
@@ -29,10 +30,18 @@ export default function App() {
     setNewTask({ ...newTask, description: t })
   }
 
-  const deleteTask = (id) => {
-    // setTasks(tasks.filter(task => task != id))
+  const handlerModal = (id) => {
+    setIdSelected(id)
     setModalVisible(true)
   }
+  
+  const deleteTask = () => {
+    console.log("Eliminado: " + idSelected)
+    setTasks(tasks.filter(task => task != idSelected))
+    setModalVisible(false)
+  }
+
+
 
   return (
     <View style={styles.container}>
@@ -63,14 +72,14 @@ export default function App() {
               <Text style={styles.text}>
                 {item.title}
               </Text>
-              <Button title='DEL' onPress={() => deleteTask(item.id)} />
+              <Button title='DEL' onPress={() => handlerModal(item.id)} />
             </View>
           )}
         />
         <Modal visible={modalVisible} >
           <View>
             <Text>Estas seguro que quieres borrar?</Text>
-            <Button title='si' onPress={() => console.log("Eliminar")}/>
+            <Button title='si' onPress={deleteTask}/>
             <Button title='no' onPress={() => setModalVisible(false)} />
           </View>
         </Modal>
